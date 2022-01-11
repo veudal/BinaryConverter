@@ -11,21 +11,29 @@ namespace BinaryConverter
     {
         public static string ToText(string binary)
         {
-            var text = GetBytesFromBinaryString(binary);
-            return Encoding.ASCII.GetString(text);
+            binary = binary.Replace(" ", "");
+            byte[] text = GetBytesFromBinaryString(binary);
+            if (text != null)
+            {
+                return Encoding.ASCII.GetString(text);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public static string ToBinary(string input)
         {
-            input = reverseString(input);
+            input = ReverseString(input);
             BitArray bitArray = new BitArray(Encoding.UTF8.GetBytes(input));
-            string bits = "";
-            bits = writeBits(bits, bitArray);
-            return reverseString(bits);
+            string bits = WriteBits(bitArray);
+            return ReverseString(bits);
         }
 
-        private static string writeBits(string bits, BitArray bitArray)
+        private static string WriteBits(BitArray bitArray)
         {
+            string bits = string.Empty;
             foreach (bool bit in bitArray)
             {
                 if (bit == true)
@@ -37,33 +45,32 @@ namespace BinaryConverter
                     bits += "0";
                 }
             }
-
             return bits;
         }
 
-        private static Byte[] GetBytesFromBinaryString(String binary)
+        private static byte[] GetBytesFromBinaryString(string binaryString)
         {
-            var list = new List<Byte>();
-
-            for (int i = 0; i < binary.Length; i += 8)
+            if (binaryString.Length % 8 == 0)
             {
-                String t = binary.Substring(i, 8);
-
-                list.Add(Convert.ToByte(t, 2));
+                byte[] byteArray = new byte[binaryString.Length / 8];
+                for (int i = 0; i < binaryString.Length; i += 8)
+                {
+                    string t = binaryString.Substring(i, 8);
+                    byteArray[i /8] = Convert.ToByte(t, 2);
+                }
+                return byteArray;
             }
-
-            return list.ToArray();
+            else
+            {
+                return null;
+            }
         }
 
-        private static string reverseString(string str)
+        private static string ReverseString(string str)
         {
-            string reversedString = "";
-            foreach (char c in str)
-            {
-                reversedString = c + reversedString;
-            }
-
-            return reversedString;
+            char[] chars = str.ToCharArray();
+            Array.Reverse(chars);
+            return new string(chars);
         }
     }
 }
